@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Sparkles, Send, X, MessageCircle } from 'lucide-react'
 import { coachContext } from '../lib/logic'
 
@@ -22,6 +22,76 @@ export function ChatBot() {
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // ── Draggable floating button ──────────────────────────────────────────
+  // Users can drag the AI button anywhere so it never blocks content.
+  // Position (relative to the app container) is remembered across reloads.
+  const fabRef = useRef<HTMLButtonElement>(null)
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(() => {
+    try {
+      const s = localStorage.getItem('pd_fab_pos')
+      return s ? JSON.parse(s) : null
+    } catch {
+      return null
+    }
+  })
+  const drag = useRef({ active: false, moved: false, dx: 0, dy: 0, sx: 0, sy: 0 })
+
+  // Keep a remembered position on-screen if the viewport changed size.
+  useEffect(() => {
+    const btn = fabRef.current
+    const parent = btn?.offsetParent as HTMLElement | null
+    if (!pos || !btn || !parent) return
+    const maxX = parent.clientWidth - btn.offsetWidth - 8
+    const maxY = parent.clientHeight - btn.offsetHeight - 8
+    const x = Math.max(8, Math.min(pos.x, maxX))
+    const y = Math.max(8, Math.min(pos.y, maxY))
+    if (x !== pos.x || y !== pos.y) setPos({ x, y })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function onFabPointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    const btn = fabRef.current
+    if (!btn) return
+    const rect = btn.getBoundingClientRect()
+    drag.current = {
+      active: true,
+      moved: false,
+      dx: e.clientX - rect.left,
+      dy: e.clientY - rect.top,
+      sx: e.clientX,
+      sy: e.clientY,
+    }
+    btn.setPointerCapture(e.pointerId)
+  }
+
+  function onFabPointerMove(e: React.PointerEvent<HTMLButtonElement>) {
+    const d = drag.current
+    if (!d.active) return
+    if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 6) return
+    d.moved = true
+    const btn = fabRef.current!
+    const parent = btn.offsetParent as HTMLElement | null
+    if (!parent) return
+    const pr = parent.getBoundingClientRect()
+    const maxX = pr.width - btn.offsetWidth - 8
+    const maxY = pr.height - btn.offsetHeight - 8
+    const x = Math.max(8, Math.min(e.clientX - pr.left - d.dx, maxX))
+    const y = Math.max(8, Math.min(e.clientY - pr.top - d.dy, maxY))
+    setPos({ x, y })
+  }
+
+  function onFabPointerUp() {
+    if (!drag.current.active) return
+    drag.current.active = false
+    if (drag.current.moved && pos) {
+      try {
+        localStorage.setItem('pd_fab_pos', JSON.stringify(pos))
+      } catch {
+        /* ignore storage failures */
+      }
+    }
+  }
 
   async function ask(question: string) {
     if (!question.trim() || busy) return
@@ -50,15 +120,25 @@ export function ChatBot() {
 
   return (
     <>
-      {/* Floating action button */}
+      {/* Floating action button — draggable, tap to open */}
       {!open && (
         <button
-          onClick={() => setOpen(true)}
-          aria-label="Open AI assistant"
-          className="absolute bottom-24 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-teal-600 text-white shadow-float active:scale-95"
+          ref={fabRef}
+          onClick={() => {
+            if (!drag.current.moved) setOpen(true)
+          }}
+          onPointerDown={onFabPointerDown}
+          onPointerMove={onFabPointerMove}
+          onPointerUp={onFabPointerUp}
+          aria-label="Open AI assistant (drag to move)"
+          title="Tap to open · drag to move"
+          style={pos ? { left: pos.x, top: pos.y } : undefined}
+          className={`absolute z-30 flex h-14 w-14 touch-none cursor-grab select-none items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-teal-600 text-white shadow-float active:scale-95 active:cursor-grabbing ${
+            pos ? '' : 'bottom-24 right-4'
+          }`}
         >
           <MessageCircle size={24} />
-          <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-[10px] font-extrabold text-white">
+          <span className="pointer-events-none absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-[10px] font-extrabold text-white">
             AI
           </span>
         </button>

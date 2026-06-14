@@ -34,18 +34,18 @@ export function ProfileScreen() {
   return (
     <div className="animate-pop px-4 pb-6 pt-4">
       {/* Account header (Module 0.1) */}
-      <Card className="flex items-center gap-3 p-4">
-        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-teal-600 text-lg font-extrabold text-white">
+      <div className="-mx-4 -mt-4 mb-4 flex items-center gap-3 bg-gradient-to-br from-brand-600 to-teal-600 px-5 pb-6 pt-5 text-white">
+        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/20 text-lg font-extrabold text-white">
           {user.initials}
         </div>
         <div className="flex-1">
-          <div className="text-[16px] font-extrabold text-ink">{user.name}</div>
-          <div className="text-[12px] text-ink-faint">{user.email}</div>
+          <div className="text-[17px] font-extrabold">{user.name}</div>
+          <div className="text-[12px] text-white/85">{user.email}</div>
         </div>
-        <button className="rounded-xl bg-slate-100 px-3 py-2 text-[12px] font-semibold text-ink-soft">
+        <button className="rounded-xl bg-white/15 px-3 py-2 text-[12px] font-semibold text-white">
           Edit
         </button>
-      </Card>
+      </div>
 
       {/* Vehicles (Module 0.2 / 0.3) */}
       <SectionTitle action={<AddBtn />}>My vehicles</SectionTitle>
@@ -196,11 +196,13 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
       onClick={onClick}
       role="switch"
       aria-checked={on}
-      className={`relative h-6 w-11 rounded-full transition-colors ${on ? 'bg-brand-500' : 'bg-slate-300'}`}
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+        on ? 'bg-brand-500' : 'bg-slate-300'
+      }`}
     >
       <span
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-          on ? 'translate-x-5' : 'translate-x-0.5'
+        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${
+          on ? 'translate-x-[1.375rem]' : 'translate-x-[0.125rem]'
         }`}
       />
     </button>

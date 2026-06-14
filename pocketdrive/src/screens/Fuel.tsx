@@ -19,7 +19,7 @@ import {
   Pencil,
   Plus,
 } from 'lucide-react'
-import { Card, SectionTitle, Pill, StatTile } from '../components/ui'
+import { Card, SectionTitle, Pill, StatTile, ScreenHeader } from '../components/ui'
 import {
   fuelPrices,
   priceHistory,
@@ -39,8 +39,7 @@ export function FuelScreen() {
   const [sub, setSub] = useState<SubTab>('prices')
   return (
     <div className="animate-pop px-4 pb-6 pt-4">
-      <h1 className="px-1 text-2xl font-extrabold tracking-tight text-ink">Fuel</h1>
-      <p className="px-1 text-[12px] text-ink-faint">Prices, costs and your consumption</p>
+      <ScreenHeader title="Fuel" subtitle="Prices, costs and your consumption" />
 
       <div className="mt-3 flex rounded-2xl bg-slate-100 p-1">
         {(['prices', 'logbook'] as SubTab[]).map((t) => (

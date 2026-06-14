@@ -27,6 +27,32 @@ export function Card({
   )
 }
 
+// Full-bleed green page header shared by every screen for a cohesive theme.
+// Assumes it is the first child of a screen wrapper padded with `px-4 pt-4`;
+// the negative margins cancel that padding so the gradient runs edge-to-edge,
+// matching the Home dashboard header.
+export function ScreenHeader({
+  title,
+  subtitle,
+  right,
+}: {
+  title: string
+  subtitle?: string
+  right?: ReactNode
+}) {
+  return (
+    <div className="-mx-4 -mt-4 mb-4 bg-gradient-to-br from-brand-600 to-teal-600 px-5 pb-7 pt-5 text-white">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
+          {subtitle && <p className="mt-0.5 text-[12.5px] text-white/85">{subtitle}</p>}
+        </div>
+        {right}
+      </div>
+    </div>
+  )
+}
+
 export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex items-center justify-between px-1 mb-2 mt-5">
@@ -70,9 +96,9 @@ export function StatTile({
 }) {
   return (
     <div className="rounded-2xl bg-white shadow-card border border-slate-100 p-3.5">
-      <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{label}</div>
-      <div className={`mt-1 text-2xl font-extrabold tracking-tight ${accent}`}>{value}</div>
-      {sub && <div className="text-[11px] text-ink-faint mt-0.5">{sub}</div>}
+      <div className="truncate text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{label}</div>
+      <div className={`mt-1 truncate text-2xl font-extrabold leading-tight tracking-tight tabular-nums ${accent}`}>{value}</div>
+      {sub && <div className="truncate text-[11px] text-ink-faint mt-0.5">{sub}</div>}
     </div>
   )
 }

@@ -13,7 +13,7 @@ import {
   Navigation2,
   Square,
 } from 'lucide-react'
-import { Card, SectionTitle, Pill } from '../components/ui'
+import { Card, SectionTitle, Pill, ScreenHeader } from '../components/ui'
 import { sampleTrip, routes, altTransport, type Route } from '../data/seed'
 import { RM } from '../lib/logic'
 
@@ -39,8 +39,7 @@ export function NavigateScreen() {
 
   return (
     <div className="animate-pop px-4 pb-6 pt-4">
-      <h1 className="px-1 text-2xl font-extrabold tracking-tight text-ink">Navigate</h1>
-      <p className="px-1 text-[12px] text-ink-faint">Fuel-smart route comparison</p>
+      <ScreenHeader title="Navigate" subtitle="Fuel-smart route comparison" />
 
       {/* Trip input — editable (Module 5.1) */}
       <Card className="mt-3 p-4">

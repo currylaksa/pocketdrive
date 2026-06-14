@@ -44,7 +44,7 @@ export function HomeScreen({
   return (
     <div className="animate-pop">
       {/* Header */}
-      <div className="bg-gradient-to-br from-brand-600 to-teal-600 px-5 pb-7 pt-1 text-white">
+      <div className="bg-gradient-to-br from-brand-600 to-teal-600 px-5 pb-7 pt-4 text-white">
         <div className="flex items-center justify-between">
           <div>
             <div className="text-[13px] text-white/80">Selamat pagi 👋</div>
@@ -56,7 +56,7 @@ export function HomeScreen({
             className="relative grid h-10 w-10 place-items-center rounded-full bg-white/15"
           >
             <Bell size={19} />
-            <span className="absolute right-2 top-2 grid h-4 w-4 place-items-center rounded-full bg-amber-400 text-[9px] font-extrabold text-white">
+            <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-amber-400 text-[9px] font-extrabold text-white ring-2 ring-brand-600">
               {alerts.length}
             </span>
           </button>
@@ -137,7 +137,7 @@ export function HomeScreen({
 
         {/* KPI tiles */}
         <div className="mt-3 grid grid-cols-3 gap-2.5">
-          <StatTile label="Spent" value={RM(budget.spentRM)} sub="this month" accent="text-ink" />
+          <StatTile label="Spent" value={`RM${Math.round(budget.spentRM)}`} sub="this month" accent="text-ink" />
           <StatTile label="Efficiency" value="18.6" sub="km/L" accent="text-brand-600" />
           <StatTile label="CO₂" value="117" sub="kg this mo" accent="text-teal-600" />
         </div>

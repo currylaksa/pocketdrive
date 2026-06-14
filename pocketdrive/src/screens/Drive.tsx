@@ -12,7 +12,7 @@ import {
   ChevronRight,
   Clock,
 } from 'lucide-react'
-import { Card, SectionTitle, ScoreRing, Pill, ProgressBar } from '../components/ui'
+import { Card, SectionTitle, ScoreRing, Pill, ProgressBar, ScreenHeader } from '../components/ui'
 import { driveSession, co2Trend, driveDays, type Session } from '../data/seed'
 import {
   ecoDrivingScore,
@@ -51,8 +51,7 @@ export function DriveScreen() {
 
   return (
     <div className="animate-pop px-4 pb-6 pt-4">
-      <h1 className="px-1 text-2xl font-extrabold tracking-tight text-ink">Drive</h1>
-      <p className="px-1 text-[12px] text-ink-faint">Daily footprint, sessions &amp; score</p>
+      <ScreenHeader title="Drive" subtitle="Daily footprint, sessions & score" />
 
       {/* ── Daily trip footprint (Module 4.2) — light & readable ── */}
       <SectionTitle>Daily trip footprint</SectionTitle>

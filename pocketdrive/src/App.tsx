@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Home, Fuel, Gauge, Navigation, User } from 'lucide-react'
-import { PhoneFrame, StatusBar } from './components/PhoneFrame'
+import { PhoneFrame } from './components/PhoneFrame'
 import { ChatBot } from './components/ChatBot'
 import { NotificationsSheet } from './components/Notifications'
 import { HomeScreen } from './screens/Home'
@@ -26,11 +26,6 @@ export default function App() {
   return (
     <PhoneFrame>
       <div className="relative flex h-full flex-col">
-        {/* Gradient header band carries the status bar */}
-        <div className="bg-gradient-to-br from-brand-600 to-teal-600 pb-0">
-          <StatusBar />
-        </div>
-
         {/* Scrollable content */}
         <main className="no-scrollbar flex-1 overflow-y-auto bg-slate-50">
           {tab === 'home' && (
