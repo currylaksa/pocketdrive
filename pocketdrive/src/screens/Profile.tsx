@@ -157,7 +157,7 @@ export function ProfileScreen() {
         ))}
       </Card>
 
-      <div className="mt-5 text-center text-[11px] text-ink-faint">Jimat v0.1 · Prototype</div>
+      <div className="mt-5 text-center text-[11px] text-ink-faint">PocketDrive v0.1 · Prototype</div>
     </div>
   )
 }

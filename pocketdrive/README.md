@@ -1,6 +1,6 @@
-# Jimat — Smart Fuel Management & Eco-Driving Assistant
+# PocketDrive — Smart Fuel Management & Eco-Driving Assistant
 
-*Jimat* means "save" in Malay. A mobile app prototype for Malaysian drivers to **spend less on petrol and cut emissions**, built for the Vibeathon.
+**PocketDrive** is a mobile app prototype for Malaysian drivers to **spend less on petrol and cut emissions**, built for the Vibeathon.
 
 > **Demo principle:** this is a high-fidelity prototype. Real APIs, OCR and ML are simulated with grounded sample data so evaluators can experience the full flow and value. The one genuinely live AI is the **Eco-Coach** (Claude).
 
@@ -15,7 +15,7 @@ Open the link — the app renders inside a phone frame, ready to screenshot or d
 
 ### Enable the live AI Eco-Coach (optional but recommended for judging)
 
-The **Drive → Ask Eco-Coach** chat calls **Claude (`claude-opus-4-8`)** live. Provide a key:
+The **Drive → Ask Eco-Coach** chat calls **Claude (`claude-haiku-4-5`)** live. Provide a key:
 
 ```bash
 cp .env.example .env      # then paste your key into .env
@@ -48,4 +48,4 @@ All sample data lives in [`src/data/seed.ts`](src/data/seed.ts); the formulas an
 
 ## Stack
 
-React + Vite + TypeScript + Tailwind · Recharts · lucide-react · Anthropic SDK (Eco-Coach via a tiny `/api/coach` dev-server middleware in `vite.config.ts`).
+React + Vite + TypeScript + Tailwind · Recharts · lucide-react · Anthropic SDK. The Eco-Coach is served by `/api/coach` — a Vite dev-server middleware locally (`vite.config.ts`) and a Vercel serverless function in production (`api/coach.ts`), both sharing `src/lib/coach-core.ts`.

@@ -1,4 +1,4 @@
-# Jimat — Pitch Notes
+# PocketDrive — Pitch Notes
 
 *Drive smart. Spend less. Emit less.*
 
@@ -19,7 +19,7 @@ One app that turns scattered fuel data into **money saved and emissions cut**:
 - Know **when and how much to refuel** before prices change.
 - Ask a **live AI Eco-Coach** anything, grounded in your own data.
 
-**Why us vs alternatives:** generic fuel-log apps track spend but don't coach; navigation apps optimise time, not fuel cost or CO₂. Jimat unifies cost + behaviour + route + emissions into one actionable score and a conversational coach — localised to Malaysian prices and roads.
+**Why us vs alternatives:** generic fuel-log apps track spend but don't coach; navigation apps optimise time, not fuel cost or CO₂. PocketDrive unifies cost + behaviour + route + emissions into one actionable score and a conversational coach — localised to Malaysian prices and roads.
 
 ## 4. Effective & creative use of AI
 - **Live Claude Eco-Coach** reasons over the driver's real metrics (idling, braking, Eco-Score, RON95 price) to give personalised, Ringgit-quantified advice — genuine AI in the product, not a chatbot bolt-on.
