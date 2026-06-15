@@ -48,4 +48,4 @@ All sample data lives in [`src/data/seed.ts`](src/data/seed.ts); the formulas an
 
 ## Stack
 
-React + Vite + TypeScript + Tailwind · Recharts · lucide-react · Anthropic SDK. The Eco-Coach is served by `/api/coach` — a Vite dev-server middleware locally (`vite.config.ts`) and a Vercel serverless function in production (`api/coach.ts`), both sharing `src/lib/coach-core.ts`.
+React + Vite + TypeScript + Tailwind · Recharts · lucide-react · Anthropic SDK. The live AI (Eco-Coach + **AI Fuel Copilot**) is served by `/api/coach` — a Vite dev-server middleware locally (`vite.config.ts`, sharing `src/lib/coach-core.ts`) and a Vercel serverless function in production (`api/coach.ts`, kept **self-contained** because Vercel doesn't bundle cross-directory ESM imports). Keep the prompts in the two in sync.
