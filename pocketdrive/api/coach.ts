@@ -1,33 +1,53 @@
-// Production Eco-Coach endpoint: POST /api/coach
-// Vercel serverless function. Mirrors the Vite dev middleware via shared logic.
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import { generateReply, generateTripReply, type CopilotMessage } from '../src/lib/coach-core'
+// Production Eco-Coach + Fuel Copilot endpoint: POST /api/coach
+// Vercel serverless function (Node runtime). Mirrors the Vite dev middleware,
+// but defensive: it dynamically imports the shared logic and surfaces any error
+// as JSON so the browser degrades gracefully instead of hitting a platform 500.
 
-function readBody(req: IncomingMessage): Promise<string> {
-  return new Promise((resolve) => {
-    let data = ''
-    req.on('data', (chunk) => (data += chunk))
-    req.on('end', () => resolve(data))
-  })
-}
+export default async function handler(req: any, res: any) {
+  res.setHeader('Content-Type', 'application/json')
 
-export default async function handler(req: IncomingMessage & { method?: string }, res: ServerResponse) {
   if (req.method !== 'POST') {
     res.statusCode = 405
-    res.end('Method Not Allowed')
+    res.end(JSON.stringify({ error: 'Method Not Allowed' }))
     return
   }
-  const raw = await readBody(req)
-  let payload: { question?: string; context?: any; mode?: string; messages?: CopilotMessage[] } = {}
+
   try {
-    payload = JSON.parse(raw || '{}')
-  } catch {
-    /* ignore malformed body, fall back below */
+    // Vercel auto-parses JSON bodies into req.body; fall back to a manual stream
+    // read for runtimes that don't (keeps parity with the Vite dev middleware).
+    let payload: { question?: string; context?: any; mode?: string; messages?: any[] } = {}
+    if (req.body && typeof req.body === 'object') {
+      payload = req.body
+    } else if (typeof req.body === 'string' && req.body.trim()) {
+      payload = JSON.parse(req.body)
+    } else {
+      const raw: string = await new Promise((resolve) => {
+        let d = ''
+        req.on('data', (c: any) => (d += c))
+        req.on('end', () => resolve(d))
+        req.on('error', () => resolve(''))
+      })
+      payload = raw ? JSON.parse(raw) : {}
+    }
+
+    const { generateReply, generateTripReply } = await import('../src/lib/coach-core')
+    const key = process.env.ANTHROPIC_API_KEY
+    const result =
+      payload.mode === 'copilot'
+        ? await generateTripReply(payload.messages ?? [], key)
+        : await generateReply(payload.question ?? '', payload.context ?? {}, key)
+
+    res.statusCode = 200
+    res.end(JSON.stringify(result))
+  } catch (err: any) {
+    // Never surface a platform 500 to the client — return a usable fallback.
+    res.statusCode = 200
+    res.end(
+      JSON.stringify({
+        reply: "I couldn't plan that just now — please try again in a moment.",
+        source: 'fallback',
+        error: String(err?.stack || err?.message || err),
+      }),
+    )
   }
-  const result =
-    payload.mode === 'copilot'
-      ? await generateTripReply(payload.messages ?? [], process.env.ANTHROPIC_API_KEY)
-      : await generateReply(payload.question ?? '', payload.context ?? {}, process.env.ANTHROPIC_API_KEY)
-  res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify(result))
 }
