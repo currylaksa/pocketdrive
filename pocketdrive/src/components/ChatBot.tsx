@@ -16,7 +16,7 @@ export function ChatBot() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: 'bot',
-      text: "Hi Aiman! I'm your PocketDrive assistant. Ask me anything about your fuel, driving, routes or emissions — I'll use your live data.",
+      text: "Hi Amir! I'm your PocketDrive assistant. Ask me anything about your fuel, driving, routes or emissions — I'll use your live data.",
     },
   ])
   const [input, setInput] = useState('')

@@ -4,8 +4,8 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 export const user = {
-  name: 'Aiman Rahman',
-  email: 'aiman@example.com',
+  name: 'Amir Rahman',
+  email: 'amir@example.com',
   initials: 'AR',
 }
 
