@@ -118,7 +118,7 @@ export function DriveScreen() {
                       {s.time} · {s.distanceKm} km · {s.durationMin} min
                     </div>
                   </div>
-                  <Pill tone="brand">{estimateFuel(s.distanceKm, 18.6).toFixed(2)} L</Pill>
+                  <Pill tone="brand">{estimateFuel(s.distanceKm, 14.2).toFixed(2)} L</Pill>
                   <ChevronDown size={17} className={`text-slate-400 transition-transform ${openSession === s.id ? 'rotate-180' : ''}`} />
                 </button>
                 {openSession === s.id && <SessionReplay session={s} />}
@@ -223,7 +223,7 @@ function SessionReplay({ session }: { session: Session }) {
         <div className="mt-4 grid grid-cols-4 gap-1.5 text-center">
           <Metric value={`${elapsed}m`} label="duration" />
           <Metric value={`${session.distanceKm}`} label="km" />
-          <Metric value={`${estimateFuel(session.distanceKm, 18.6).toFixed(2)}`} label="L fuel" />
+          <Metric value={`${estimateFuel(session.distanceKm, 14.2).toFixed(2)}`} label="L fuel" />
           <Metric value={`${session.topSpeed}`} label="top km/h" />
         </div>
         {phase === 'running' && (

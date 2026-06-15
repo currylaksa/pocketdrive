@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { Card, ScoreRing, StatTile, ProgressBar, Pill, SectionTitle } from '../components/ui'
 import { FuelCopilot } from '../components/FuelCopilot'
-import { user, vehicles, budget, alerts, goals, mileage } from '../data/seed'
+import { user, vehicles, budget, alerts, goals, mileage, efficiencyStats, co2Trend } from '../data/seed'
 import { ecoScore, scoreBand, RM, refuelAdvice } from '../lib/logic'
 
 const alertDot: Record<string, string> = {
@@ -148,8 +148,8 @@ export function HomeScreen({
             accent="text-brand-600"
           />
           <StatTile label="Spent" value={`RM${Math.round(budget.spentRM)}`} sub="this month" accent="text-ink" />
-          <StatTile label="Efficiency" value="18.6" sub="km/L" accent="text-brand-600" />
-          <StatTile label="CO₂" value="117" sub="kg this mo" accent="text-teal-600" />
+          <StatTile label="Efficiency" value={efficiencyStats.current} sub="km/L" accent="text-brand-600" />
+          <StatTile label="CO₂" value={co2Trend[co2Trend.length - 1].kg} sub="kg this mo" accent="text-teal-600" />
         </div>
 
         {/* Mileage records (Module 0.4) */}

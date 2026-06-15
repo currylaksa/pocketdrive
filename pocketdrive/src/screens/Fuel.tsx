@@ -122,7 +122,7 @@ function Prices() {
         <ResponsiveContainer width="100%" height={150}>
           <LineChart data={priceHistory[range]} margin={{ top: 5, right: 6, left: -22, bottom: 0 }}>
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <YAxis domain={[2, 3.6]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis domain={[2, 3.2]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12, border: '1px solid #e2e8f0' }} />
             <Line type="monotone" dataKey="RON97" stroke="#f59e0b" strokeWidth={2.5} dot={false} />
             <Line type="monotone" dataKey="Diesel" stroke="#0d9488" strokeWidth={2.5} dot={false} />
@@ -331,7 +331,7 @@ function Logbook() {
         <ResponsiveContainer width="100%" height={120}>
           <LineChart data={efficiencyTrend} margin={{ top: 5, right: 6, left: -26, bottom: 0 }}>
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-            <YAxis domain={[15, 20]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis domain={[12, 16]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12, border: '1px solid #e2e8f0' }} />
             <Line type="monotone" dataKey="kmL" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} />
           </LineChart>
@@ -353,7 +353,7 @@ function Logbook() {
           </BarChart>
         </ResponsiveContainer>
         <p className="px-1 pb-1 text-[11px] text-amber-700">
-          Fuel expenses rose RM35.60 (+14%) compared to last month.
+          Fuel expenses rose RM13.00 (+7%) compared to last month.
         </p>
       </Card>
 

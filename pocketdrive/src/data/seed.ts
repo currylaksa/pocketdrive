@@ -31,10 +31,10 @@ export const vehicles: Vehicle[] = [
     year: 2021,
     fuelType: 'RON95',
     engine: '1.5L',
-    tankCapacity: 36,
+    tankCapacity: 42,
     transmission: 'Automatic',
-    baselineEfficiency: 18.2, // ~5.5 L/100km
-    fuelLevelPct: 38,
+    baselineEfficiency: 14.2, // ~7.0 L/100km
+    fuelLevelPct: 43, // ≈ 18 L of 42 L
   },
   {
     id: 'city',
@@ -52,8 +52,8 @@ export const vehicles: Vehicle[] = [
 
 // Module 0.5 / 0.6 — Budget & environmental goals
 export const budget = {
-  monthlyRM: 350,
-  spentRM: 287.4,
+  monthlyRM: 300,
+  spentRM: 187,
 }
 
 export const goals = {
@@ -84,7 +84,7 @@ export const fuelPrices = {
   weekLabel: '12–18 Jun 2026',
   prices: [
     { type: 'RON95', price: 2.05, delta: 0.0, unit: 'L' },
-    { type: 'RON97', price: 3.36, delta: +0.1, unit: 'L' },
+    { type: 'RON97', price: 2.90, delta: +0.1, unit: 'L' },
     { type: 'Diesel', price: 2.88, delta: -0.05, unit: 'L' },
   ],
 }
@@ -92,35 +92,35 @@ export const fuelPrices = {
 // Module 1.2 — Price history at three zoom levels (week / month / year)
 export const priceHistory = {
   week: [
-    { label: 'Mon', RON95: 2.05, RON97: 3.34, Diesel: 2.9 },
-    { label: 'Tue', RON95: 2.05, RON97: 3.34, Diesel: 2.9 },
-    { label: 'Wed', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
-    { label: 'Thu', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
-    { label: 'Fri', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
-    { label: 'Sat', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
-    { label: 'Sun', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
+    { label: 'Mon', RON95: 2.05, RON97: 2.80, Diesel: 2.9 },
+    { label: 'Tue', RON95: 2.05, RON97: 2.80, Diesel: 2.9 },
+    { label: 'Wed', RON95: 2.05, RON97: 2.83, Diesel: 2.88 },
+    { label: 'Thu', RON95: 2.05, RON97: 2.85, Diesel: 2.88 },
+    { label: 'Fri', RON95: 2.05, RON97: 2.88, Diesel: 2.88 },
+    { label: 'Sat', RON95: 2.05, RON97: 2.90, Diesel: 2.88 },
+    { label: 'Sun', RON95: 2.05, RON97: 2.90, Diesel: 2.88 },
   ],
   month: [
-    { label: 'W1', RON95: 2.05, RON97: 3.18, Diesel: 2.95 },
-    { label: 'W2', RON95: 2.05, RON97: 3.22, Diesel: 2.92 },
-    { label: 'W3', RON95: 2.05, RON97: 3.2, Diesel: 2.9 },
-    { label: 'W4', RON95: 2.05, RON97: 3.26, Diesel: 2.93 },
-    { label: 'W5', RON95: 2.05, RON97: 3.26, Diesel: 2.88 },
-    { label: 'W6', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
+    { label: 'W1', RON95: 2.05, RON97: 2.66, Diesel: 2.95 },
+    { label: 'W2', RON95: 2.05, RON97: 2.70, Diesel: 2.92 },
+    { label: 'W3', RON95: 2.05, RON97: 2.72, Diesel: 2.9 },
+    { label: 'W4', RON95: 2.05, RON97: 2.78, Diesel: 2.93 },
+    { label: 'W5', RON95: 2.05, RON97: 2.82, Diesel: 2.88 },
+    { label: 'W6', RON95: 2.05, RON97: 2.90, Diesel: 2.88 },
   ],
   year: [
-    { label: 'Jul', RON95: 2.05, RON97: 3.02, Diesel: 2.85 },
-    { label: 'Aug', RON95: 2.05, RON97: 3.08, Diesel: 2.88 },
-    { label: 'Sep', RON95: 2.05, RON97: 3.15, Diesel: 2.9 },
-    { label: 'Oct', RON95: 2.05, RON97: 3.12, Diesel: 2.95 },
-    { label: 'Nov', RON95: 2.05, RON97: 3.1, Diesel: 2.98 },
-    { label: 'Dec', RON95: 2.05, RON97: 3.2, Diesel: 3.0 },
-    { label: 'Jan', RON95: 2.05, RON97: 3.25, Diesel: 2.97 },
-    { label: 'Feb', RON95: 2.05, RON97: 3.18, Diesel: 2.94 },
-    { label: 'Mar', RON95: 2.05, RON97: 3.22, Diesel: 2.92 },
-    { label: 'Apr', RON95: 2.05, RON97: 3.28, Diesel: 2.9 },
-    { label: 'May', RON95: 2.05, RON97: 3.26, Diesel: 2.89 },
-    { label: 'Jun', RON95: 2.05, RON97: 3.36, Diesel: 2.88 },
+    { label: 'Jul', RON95: 2.05, RON97: 2.58, Diesel: 2.85 },
+    { label: 'Aug', RON95: 2.05, RON97: 2.62, Diesel: 2.88 },
+    { label: 'Sep', RON95: 2.05, RON97: 2.66, Diesel: 2.9 },
+    { label: 'Oct', RON95: 2.05, RON97: 2.64, Diesel: 2.95 },
+    { label: 'Nov', RON95: 2.05, RON97: 2.68, Diesel: 2.98 },
+    { label: 'Dec', RON95: 2.05, RON97: 2.72, Diesel: 3.0 },
+    { label: 'Jan', RON95: 2.05, RON97: 2.76, Diesel: 2.97 },
+    { label: 'Feb', RON95: 2.05, RON97: 2.70, Diesel: 2.94 },
+    { label: 'Mar', RON95: 2.05, RON97: 2.74, Diesel: 2.92 },
+    { label: 'Apr', RON95: 2.05, RON97: 2.80, Diesel: 2.9 },
+    { label: 'May', RON95: 2.05, RON97: 2.85, Diesel: 2.89 },
+    { label: 'Jun', RON95: 2.05, RON97: 2.90, Diesel: 2.88 },
   ],
 }
 
@@ -153,26 +153,26 @@ export const ocrResult = {
 
 // Module 2.5 — Efficiency trend (km/L over recent fills)
 export const efficiencyTrend = [
-  { label: 'Mar', kmL: 16.9 },
-  { label: 'Apr', kmL: 17.4 },
-  { label: 'May', kmL: 18.1 },
-  { label: 'Jun', kmL: 18.6 },
+  { label: 'Mar', kmL: 12.5 },
+  { label: 'Apr', kmL: 13.1 },
+  { label: 'May', kmL: 13.8 },
+  { label: 'Jun', kmL: 14.2 },
 ]
 
 export const efficiencyStats = {
-  current: 18.6,
-  best: 19.2,
-  worst: 15.8,
-  baseline: 18.2,
+  current: 14.2,
+  best: 15.1,
+  worst: 12.6,
+  baseline: 13.8,
 }
 
 // Module 2.6 — Monthly spending breakdown
 export const monthlySpend = [
-  { month: 'Feb', rm: 242 },
-  { month: 'Mar', rm: 268 },
-  { month: 'Apr', rm: 255 },
-  { month: 'May', rm: 251.8 },
-  { month: 'Jun', rm: 287.4 },
+  { month: 'Feb', rm: 152 },
+  { month: 'Mar', rm: 171 },
+  { month: 'Apr', rm: 162 },
+  { month: 'May', rm: 174 },
+  { month: 'Jun', rm: 187 },
 ]
 
 // Module 3.1 / 3.2 — A completed driving session (the "Simulate Drive" result)
@@ -296,10 +296,10 @@ export const CO2_FACTOR = { petrol: 2.31, diesel: 2.68 } // kg CO2 / litre
 
 // Module 4.5 — Monthly CO2 trend
 export const co2Trend = [
-  { month: 'Mar', kg: 142 },
-  { month: 'Apr', kg: 135 },
-  { month: 'May', kg: 128 },
-  { month: 'Jun', kg: 117 },
+  { month: 'Mar', kg: 44 },
+  { month: 'Apr', kg: 42 },
+  { month: 'May', kg: 40 },
+  { month: 'Jun', kg: 38.4 },
 ]
 
 // Module 5.3 — Route comparison (hardcoded, KL → PJ)
@@ -344,11 +344,11 @@ export type Alert = {
 
 export const alerts: Alert[] = [
   { id: 'a1', kind: 'price', text: 'RON97 increased by RM0.10/L this week. Estimated extra monthly cost: RM18.', time: '2h ago' },
-  { id: 'a2', kind: 'refuel', text: 'Your tank is at 38% — enough for ~4 days of typical driving.', time: '5h ago' },
+  { id: 'a2', kind: 'refuel', text: 'Your tank is at 43% — enough for ~6 days of typical driving.', time: '5h ago' },
   { id: 'a3', kind: 'driving', text: 'Frequent harsh braking detected on your Bangsar → KLCC trip.', time: 'Yesterday' },
   { id: 'a4', kind: 'environment', text: 'You cut carbon emissions by 6% this week. Keep it up!', time: 'Yesterday' },
   { id: 'a5', kind: 'maintenance', text: 'Tyre pressure check due based on recent mileage (48,230 km).', time: '2 days ago' },
-  { id: 'a6', kind: 'efficiency', text: 'Fuel efficiency improved to 18.6 km/L — above your vehicle baseline.', time: '3 days ago' },
+  { id: 'a6', kind: 'efficiency', text: 'Fuel efficiency improved to 14.2 km/L — above your vehicle baseline.', time: '3 days ago' },
   { id: 'a7', kind: 'route', text: 'A more fuel-efficient route is available for your usual KL → PJ commute.', time: '4 days ago' },
 ]
 

@@ -92,9 +92,9 @@ export function ProfileScreen() {
         {reportState === 'ready' && (
           <div className="mt-3 animate-pop space-y-1.5 rounded-xl bg-slate-50 p-3 text-[12px]">
             <ReportLine label="Total fuel spend" value={`${RM(budget.spentRM)} (vs ${RM(budget.monthlyRM)} budget)`} />
-            <ReportLine label="Avg efficiency" value="18.6 km/L (best 19.2)" />
-            <ReportLine label="Eco-Score" value="84 · Good" />
-            <ReportLine label="CO₂ emitted" value="117 kg (−12% vs May)" />
+            <ReportLine label="Avg efficiency" value="14.2 km/L (best 15.1)" />
+            <ReportLine label="Eco-Score" value="83 · Good" />
+            <ReportLine label="CO₂ emitted" value="38.4 kg (goal 50)" />
             <ReportLine label="Fuel saved via routes" value="RM7.50" />
           </div>
         )}

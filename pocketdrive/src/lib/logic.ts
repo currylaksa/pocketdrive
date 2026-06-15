@@ -42,7 +42,7 @@ export function estimateFuel(distanceKm: number, kmPerL: number): number {
 }
 
 // Footprint of a day — aggregate of that day's drive sessions (Module 4.2)
-export function dailyFootprint(sessions: { distanceKm: number }[] = todaySessions, kmPerL = 18.6) {
+export function dailyFootprint(sessions: { distanceKm: number }[] = todaySessions, kmPerL = 14.2) {
   const km = sessions.reduce((a, s) => a + s.distanceKm, 0)
   const fuel = estimateFuel(km, kmPerL)
   const co2 = co2FromFuel(fuel)
@@ -166,6 +166,6 @@ export function coachContext() {
     aggressiveAccel: driveSession.aggressiveAccel,
     ron95Price: ron95(),
     fuelLevelPct: v.fuelLevelPct,
-    monthlySpendRM: 287.4,
+    monthlySpendRM: 187,
   }
 }
