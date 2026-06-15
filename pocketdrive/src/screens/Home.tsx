@@ -11,6 +11,7 @@ import {
   Gauge,
 } from 'lucide-react'
 import { Card, ScoreRing, StatTile, ProgressBar, Pill, SectionTitle } from '../components/ui'
+import { FuelCopilot } from '../components/FuelCopilot'
 import { user, vehicles, budget, alerts, goals, mileage } from '../data/seed'
 import { ecoScore, scoreBand, RM, refuelAdvice } from '../lib/logic'
 
@@ -47,7 +48,7 @@ export function HomeScreen({
       <div className="bg-gradient-to-br from-brand-600 to-teal-600 px-5 pb-7 pt-4 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-[13px] text-white/80">Selamat pagi 👋</div>
+            <div className="text-[13px] text-white/80">Good morning 👋</div>
             <div className="text-xl font-extrabold">{user.name.split(' ')[0]}</div>
           </div>
           <button
@@ -114,7 +115,10 @@ export function HomeScreen({
         </div>
       </div>
 
-      <div className="-mt-4 px-4 pb-6">
+      {/* AI Fuel Copilot — destination trip planner */}
+      <FuelCopilot />
+
+      <div className="mt-3 px-4 pb-6">
         {/* Eco-Score hero (Module 4.4) */}
         <Card className="p-5">
           <div className="flex items-center gap-4">
@@ -136,7 +140,13 @@ export function HomeScreen({
         </Card>
 
         {/* KPI tiles */}
-        <div className="mt-3 grid grid-cols-3 gap-2.5">
+        <div className="mt-3 grid grid-cols-2 gap-2.5">
+          <StatTile
+            label="Fuel remaining"
+            value={`${((v.fuelLevelPct / 100) * v.tankCapacity).toFixed(1)} L`}
+            sub={`of ${v.tankCapacity} L · ${v.fuelLevelPct}%`}
+            accent="text-brand-600"
+          />
           <StatTile label="Spent" value={`RM${Math.round(budget.spentRM)}`} sub="this month" accent="text-ink" />
           <StatTile label="Efficiency" value="18.6" sub="km/L" accent="text-brand-600" />
           <StatTile label="CO₂" value="117" sub="kg this mo" accent="text-teal-600" />

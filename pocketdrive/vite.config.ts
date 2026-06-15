@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import { generateReply } from './src/lib/coach-core'
+import { generateReply, generateTripReply, type CopilotMessage } from './src/lib/coach-core'
 
 // ── Live Claude "Eco-Coach" endpoint (DEV ONLY) ─────────────────────────────
 // Exposes POST /api/coach on the Vite dev server (one `npm run dev`).
@@ -26,13 +26,16 @@ function ecoCoachPlugin(): PluginOption {
           return
         }
         const raw = await readBody(req)
-        let payload: { question?: string; context?: any } = {}
+        let payload: { question?: string; context?: any; mode?: string; messages?: CopilotMessage[] } = {}
         try {
           payload = JSON.parse(raw || '{}')
         } catch {
           /* ignore malformed body, fall back below */
         }
-        const result = await generateReply(payload.question ?? '', payload.context ?? {}, process.env.ANTHROPIC_API_KEY)
+        const result =
+          payload.mode === 'copilot'
+            ? await generateTripReply(payload.messages ?? [], process.env.ANTHROPIC_API_KEY)
+            : await generateReply(payload.question ?? '', payload.context ?? {}, process.env.ANTHROPIC_API_KEY)
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify(result))
       })
