@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PocketDrive — Your Personal Fuel & Eco-Driving Co-Pilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,400..600&family=Hanken+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#060a08;
+    --bg-2:#0a120e;
+    --ink:#e9f1ec;
+    --muted:#88a194;
+    --faint:#5d7268;
+    --em:#34d399;        /* emerald */
+    --em-deep:#10b981;
+    --em-dark:#059669;
+    --gold:#f4c66a;      /* money / fuel */
+    --gold-deep:#e0a93b;
+    --line:rgba(180,225,205,0.10);
+    --line-strong:rgba(180,225,205,0.20);
+    --card:rgba(18,30,24,0.55);
+    --card-2:rgba(12,20,16,0.7);
+    --serif:"Fraunces",Georgia,serif;
+    --sans:"Hanken Grotesk",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+
+  /* grain + vignette overlays */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
+    background:radial-gradient(120% 120% at 50% 0%,transparent 55%,rgba(0,0,0,0.55) 100%);
+    mix-blend-mode:multiply;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:61;pointer-events:none;opacity:0.045;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== scroll deck ===== */
+  .deck{
+    height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;
+    scrollbar-width:none;
+  }
+  .deck::-webkit-scrollbar{display:none}
+  .chapter{
+    position:relative;min-height:100vh;width:100%;
+    scroll-snap-align:start;scroll-snap-stop:always;
+    display:flex;align-items:center;justify-content:center;
+    padding:7vh clamp(20px,7vw,110px);
+    overflow:hidden;
+  }
+  .inner{width:100%;max-width:1180px;position:relative;z-index:2}
+
+  /* per-chapter atmospheric glow */
+  .glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:0.5;z-index:0;pointer-events:none}
+  .g-em{background:radial-gradient(circle,rgba(16,185,129,0.45),transparent 70%)}
+  .g-gold{background:radial-gradient(circle,rgba(244,198,106,0.28),transparent 70%)}
+
+  /* ===== type ===== */
+  .kicker{
+    font-family:var(--mono);font-size:0.78rem;letter-spacing:0.32em;
+    text-transform:uppercase;color:var(--em);font-weight:500;
+    display:inline-flex;align-items:center;gap:0.7em;margin-bottom:1.6rem;
+  }
+  .kicker::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--em),transparent)}
+  h1,h2{font-family:var(--serif);font-weight:380;line-height:1.02;letter-spacing:-0.015em}
+  h1{font-size:clamp(2.6rem,7vw,6rem)}
+  h2{font-size:clamp(2rem,4.6vw,4rem)}
+  .lede{
+    font-size:clamp(1.02rem,1.45vw,1.32rem);line-height:1.62;color:var(--muted);
+    max-width:60ch;font-weight:400;margin-top:1.5rem;
+  }
+  .lede strong{color:var(--ink);font-weight:600}
+  .em{color:var(--em);font-style:italic}
+  .gold{color:var(--gold)}
+  .transition{
+    font-family:var(--mono);font-size:0.74rem;letter-spacing:0.12em;color:var(--faint);
+    margin-top:3rem;display:flex;align-items:center;gap:0.6em;text-transform:uppercase;
+  }
+  .transition .arr{color:var(--em);animation:nudge 1.8s ease-in-out infinite}
+  @keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+
+  /* ===== reveal ===== */
+  [data-rv]{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .chapter.active [data-rv]{opacity:1;transform:none}
+  .chapter.active [data-rv][data-d="1"]{transition-delay:.08s}
+  .chapter.active [data-rv][data-d="2"]{transition-delay:.18s}
+  .chapter.active [data-rv][data-d="3"]{transition-delay:.30s}
+  .chapter.active [data-rv][data-d="4"]{transition-delay:.42s}
+  .chapter.active [data-rv][data-d="5"]{transition-delay:.54s}
+  .chapter.active [data-rv][data-d="6"]{transition-delay:.66s}
+
+  /* ===== layout helpers ===== */
+  .split{display:grid;grid-template-columns:1.05fr 0.95fr;gap:clamp(28px,5vw,72px);align-items:center}
+  @media(max-width:900px){.split{grid-template-columns:1fr;gap:36px}}
+
+  /* ===== nav dots ===== */
+  .nav{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:13px}
+  .nav button{
+    width:9px;height:9px;border-radius:50%;border:1px solid var(--line-strong);
+    background:transparent;cursor:pointer;padding:0;transition:.35s;position:relative;
+  }
+  .nav button:hover{border-color:var(--em)}
+  .nav button.on{background:var(--em);border-color:var(--em);box-shadow:0 0 0 4px rgba(52,211,153,0.15)}
+  .nav button span{
+    position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;
+    font-family:var(--mono);font-size:0.62rem;letter-spacing:0.08em;color:var(--muted);
+    opacity:0;pointer-events:none;transition:.25s;background:var(--card-2);
+    padding:3px 8px;border-radius:5px;border:1px solid var(--line);
+  }
+  .nav button:hover span{opacity:1}
+  @media(max-width:680px){.nav{display:none}}
+
+  /* progress bar */
+  .progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--em),var(--gold));z-index:55;width:0;transition:width .15s linear}
+
+  /* brand mark top-left */
+  .brand{position:fixed;top:24px;left:28px;z-index:50;font-family:var(--mono);font-size:0.74rem;letter-spacing:0.22em;color:var(--ink);text-transform:uppercase;display:flex;align-items:center;gap:9px}
+  .brand .dot{width:8px;height:8px;border-radius:2px;background:var(--em);box-shadow:0 0 12px var(--em)}
+  .hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:50;font-family:var(--mono);font-size:0.62rem;letter-spacing:0.18em;color:var(--faint);text-transform:uppercase}
+  @media(max-width:680px){.hint{display:none}}
+
+  /* ===== cards / chips ===== */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;backdrop-filter:blur(8px)}
+  .chip{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:100px;padding:6px 13px;display:inline-block}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+
+  .gap-item{display:flex;gap:14px;align-items:flex-start}
+  .gap-item .no{font-family:var(--mono);color:var(--em);font-size:0.85rem;padding-top:2px;min-width:24px}
+  .gap-item h4{font-family:var(--sans);font-weight:600;font-size:0.98rem;margin-bottom:3px}
+  .gap-item p{font-size:0.86rem;color:var(--muted);line-height:1.5}
+
+  /* big stat */
+  .stat{font-family:var(--serif);font-size:clamp(3.4rem,9vw,7rem);line-height:0.92;letter-spacing:-0.02em}
+  .stat .unit{font-size:0.32em;color:var(--muted);font-family:var(--sans);letter-spacing:0}
+
+  /* ===== solution orbit ===== */
+  .feat{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);transition:.3s}
+  .feat:hover{border-color:var(--em-deep);transform:translateY(-3px)}
+  .feat .ic{width:38px;height:38px;flex:0 0 38px;border-radius:10px;display:grid;place-items:center;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3)}
+  .feat .ic svg{width:20px;height:20px;stroke:var(--em);fill:none;stroke-width:1.7}
+  .feat h4{font-size:0.98rem;font-weight:600;margin-bottom:3px}
+  .feat p{font-size:0.83rem;color:var(--muted);line-height:1.5}
+
+  /* mapping rows */
+  .map-row{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}
+  .map-row:last-child{border-bottom:0}
+  .map-c{font-size:0.92rem;color:var(--muted);line-height:1.45}
+  .map-s{font-size:0.95rem;color:var(--ink);font-weight:500;line-height:1.45}
+  .map-arr{color:var(--em);font-family:var(--mono);font-size:1.1rem}
+  @media(max-width:760px){.map-row{grid-template-columns:1fr;gap:4px}.map-arr{transform:rotate(90deg);justify-self:start}}
+
+  /* demo flow */
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;position:relative}
+  @media(max-width:860px){.flow{grid-template-columns:1fr 1fr}}
+  .step{position:relative;border:1px solid var(--line);border-radius:16px;padding:20px 16px;background:var(--card);min-height:170px;display:flex;flex-direction:column}
+  .step .n{font-family:var(--mono);font-size:0.72rem;color:var(--gold);letter-spacing:0.1em}
+  .step h4{font-family:var(--serif);font-size:1.45rem;font-weight:420;margin:10px 0 8px}
+  .step p{font-size:0.82rem;color:var(--muted);line-height:1.5}
+  .step .scr{margin-top:auto;font-family:var(--mono);font-size:0.62rem;color:var(--em);letter-spacing:0.06em;padding-top:12px}
+
+  /* timeline (why now) */
+  .tl{position:relative;padding-left:8px}
+  .tl-row{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:18px 0;border-left:1px solid var(--line);padding-left:30px;position:relative}
+  .tl-row::before{content:"";position:absolute;left:-6px;top:24px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--em)}
+  .tl-row.hot::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px var(--gold)}
+  .tl-when{font-family:var(--mono);font-size:0.82rem;color:var(--em);letter-spacing:0.05em}
+  .tl-row.hot .tl-when{color:var(--gold)}
+  .tl-what h4{font-size:1rem;font-weight:600;margin-bottom:4px}
+  .tl-what p{font-size:0.87rem;color:var(--muted);line-height:1.5}
+  @media(max-width:680px){.tl-row{grid-template-columns:1fr;gap:4px}}
+
+  /* business streams */
+  .stream{border:1px solid var(--line);border-radius:18px;padding:26px 22px;background:var(--card);display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+  .stream .tag{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold)}
+  .stream h4{font-family:var(--serif);font-size:1.6rem;font-weight:420}
+  .stream p{font-size:0.86rem;color:var(--muted);line-height:1.55}
+  .stream .price{font-family:var(--mono);font-size:0.8rem;color:var(--em);margin-top:auto;padding-top:10px}
+  .stream::after{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(var(--em),var(--gold))}
+
+  /* roadmap */
+  .road{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;margin-top:10px}
+  @media(max-width:760px){.road{grid-template-columns:1fr;gap:18px}}
+  .road-col{padding:0 22px;position:relative}
+  .road-col:not(:last-child){border-right:1px solid var(--line)}
+  .road-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .road-head .d{width:13px;height:13px;border-radius:50%;border:2px solid var(--em)}
+  .road-col.now .d{background:var(--em);box-shadow:0 0 12px var(--em)}
+  .road-col.next .d{border-color:var(--gold)}
+  .road-col.later .d{border-color:var(--faint)}
+  .road-head h4{font-family:var(--mono);font-size:0.82rem;letter-spacing:0.2em;text-transform:uppercase}
+  .road-col.now h4{color:var(--em)} .road-col.next h4{color:var(--gold)} .road-col.later h4{color:var(--muted)}
+  .road-col p{font-size:0.88rem;color:var(--muted);line-height:1.6}
+
+  /* team */
+  .tcard{border:1px solid var(--line);border-radius:18px;padding:28px 22px;background:var(--card);text-align:center;transition:.3s}
+  .tcard:hover{border-color:var(--em-deep);transform:translateY(-4px)}
+  .tcard .av{width:74px;height:74px;border-radius:50%;margin:0 auto 16px;background:radial-gradient(circle at 30% 30%,rgba(52,211,153,0.4),rgba(16,185,129,0.08));border:1px solid var(--line-strong);display:grid;place-items:center;font-family:var(--serif);font-size:1.6rem;color:var(--em)}
+  .tcard h4{font-size:1.1rem;font-weight:600;margin-bottom:4px}
+  .tcard p{font-family:var(--mono);font-size:0.74rem;color:var(--muted);letter-spacing:0.08em}
+
+  /* closing */
+  .close-quote{font-family:var(--serif);font-size:clamp(1.9rem,4vw,3.4rem);line-height:1.15;font-weight:340;max-width:18ch}
+  .close-slogan{font-family:var(--mono);letter-spacing:0.2em;text-transform:uppercase;color:var(--em);font-size:0.9rem;margin-top:2.4rem}
+
+  /* hero gauge */
+  .gauge-wrap{display:grid;place-items:center;position:relative}
+  .needle{transform-origin:130px 130px;animation:sweep 3.4s cubic-bezier(.7,0,.3,1) forwards}
+  @keyframes sweep{0%{transform:rotate(-120deg)}60%{transform:rotate(70deg)}100%{transform:rotate(48deg)}}
+  .score-num{font-family:var(--serif);font-size:3.4rem;fill:var(--ink)}
+
+  svg .ln{stroke:var(--line-strong)}
+  svg text{font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="brand"><span class="dot"></span>PocketDrive</div>
+<div class="hint">scroll · ↑ ↓ · click dots</div>
+<nav class="nav" id="nav"></nav>
+
+<main class="deck" id="deck">
+
+  <!-- ============ 1 · TITLE ============ -->
+  <section class="chapter" data-title="Title">
+    <div class="glow g-em" style="width:620px;height:620px;top:-12%;left:-8%"></div>
+    <div class="glow g-gold" style="width:420px;height:420px;bottom:-10%;right:-6%"></div>
+    <div class="inner split">
+      <div>
+        <span class="kicker" data-rv data-d="1">PocketDrive · Vibeathon 2026</span>
+        <h1 data-rv data-d="2">Your fuel co-pilot, in every&nbsp;<span class="em">pocket.</span></h1>
+        <p class="lede" data-rv data-d="3">A personal fuel &amp; eco-driving companion for Malaysia's new, <strong>personalized</strong> fuel economy — built around the one sensor every driver already carries.</p>
+        <div class="close-slogan" data-rv data-d="4" style="margin-top:2rem">Drive smart · Spend less · Emit less</div>
+        <div class="transition" data-rv data-d="5">The story starts with a question every driver is about to face <span class="arr">→</span></div>
+      </div>
+      <div class="gauge-wrap" data-rv data-d="3">
+        <svg width="280" height="280" viewBox="0 0 260 260">
+          <defs>
+            <linearGradient id="gaugeArc" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stop-color="#e0a93b"/><stop offset="0.5" stop-color="#34d399"/><stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+          </defs>
+          <circle cx="130" cy="130" r="118" fill="none" stroke="rgba(180,225,205,0.08)" stroke-width="2"/>
+          <path d="M 45 200 A 110 110 0 1 1 215 200" fill="none" stroke="rgba(180,225,205,0.12)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M 45 200 A 110 110 0 1 1 215 200" fill="none" stroke="url(#gaugeArc)" stroke-width="14" stroke-linecap="round" stroke-dasharray="430 600" />
+          <g class="needle">
+            <line x1="130" y1="130" x2="130" y2="44" stroke="#e9f1ec" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="130" cy="130" r="9" fill="#34d399"/>
+          </g>
+          <text class="score-num" x="130" y="150" text-anchor="middle">92</text>
+          <text x="130" y="178" text-anchor="middle" fill="#88a194" font-size="11" letter-spacing="3">ECO-SCORE</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · PROBLEM ============ -->
+  <section class="chapter" data-title="The Problem">
+    <div class="glow g-gold" style="width:520px;height:520px;top:0%;right:-10%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>01 — The Problem</span>
+      <div class="split">
+        <div>
+          <h2 data-rv data-d="1">Fuel just stopped being one national&nbsp;<span class="gold">price.</span></h2>
+          <p class="lede" data-rv data-d="2">Malaysia is mid-transition from blanket subsidies to a tiered system (<strong>BUDI95</strong>). Diesel has floated with global markets since 2024. RON95 stays subsidized for most — but the <strong>top 15%</strong> and foreign nationals now pay market rate, with monthly quotas tightening.</p>
+          <p class="lede" data-rv data-d="3">For the first time, what fuel costs <span class="em">depends on who you are and how you drive</span> — not a flat national number.</p>
+          <div class="transition" data-rv data-d="4">If cost now depends on behaviour, behaviour is where the savings hide <span class="arr">→</span></div>
+        </div>
+        <div data-rv data-d="3">
+          <!-- price fork diagram -->
+          <svg width="100%" viewBox="0 0 360 300" style="max-width:380px">
+            <text x="20" y="40" fill="#88a194" font-size="11" letter-spacing="2">BEFORE</text>
+            <rect x="18" y="52" width="150" height="40" rx="8" fill="rgba(180,225,205,0.06)" stroke="rgba(180,225,205,0.18)"/>
+            <text x="93" y="77" text-anchor="middle" fill="#e9f1ec" font-size="13">ONE FLAT PRICE</text>
+            <line x1="40" y1="98" x2="146" y2="46" stroke="#e0a93b" stroke-width="1.5"/>
+            <text x="210" y="40" fill="#34d399" font-size="11" letter-spacing="2">NOW · IT FORKS</text>
+            <!-- branch lines -->
+            <path d="M168 72 C 220 72 200 130 250 130" fill="none" stroke="rgba(180,225,205,0.25)" stroke-width="1.5"/>
+            <path d="M168 72 C 220 72 200 192 250 192" fill="none" stroke="rgba(180,225,205,0.25)" stroke-width="1.5"/>
+            <path d="M168 72 C 220 72 200 254 250 254" fill="none" stroke="rgba(180,225,205,0.25)" stroke-width="1.5"/>
+            <g>
+              <rect x="248" y="112" width="112" height="38" rx="8" fill="rgba(244,198,106,0.1)" stroke="rgba(244,198,106,0.4)"/>
+              <text x="304" y="130" text-anchor="middle" fill="#f4c66a" font-size="11">T15 + foreign</text>
+              <text x="304" y="144" text-anchor="middle" fill="#88a194" font-size="9">market rate</text>
+            </g>
+            <g>
+              <rect x="248" y="174" width="112" height="38" rx="8" fill="rgba(52,211,153,0.1)" stroke="rgba(52,211,153,0.4)"/>
+              <text x="304" y="192" text-anchor="middle" fill="#34d399" font-size="11">Most drivers</text>
+              <text x="304" y="206" text-anchor="middle" fill="#88a194" font-size="9">subsidized · quota</text>
+            </g>
+            <g>
+              <rect x="248" y="236" width="112" height="38" rx="8" fill="rgba(180,225,205,0.06)" stroke="rgba(180,225,205,0.25)"/>
+              <text x="304" y="254" text-anchor="middle" fill="#e9f1ec" font-size="11">Diesel</text>
+              <text x="304" y="268" text-anchor="middle" fill="#88a194" font-size="9">floats w/ market</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:34px;gap:14px 40px">
+        <div class="gap-item" data-rv data-d="2"><span class="no">01</span><div><h4>Reactive refuelling</h4><p>Drivers fill only when near-empty — missing savings from better timing.</p></div></div>
+        <div class="gap-item" data-rv data-d="3"><span class="no">02</span><div><h4>Invisible consumption</h4><p>No one tracks how acceleration, idling and routes inflate monthly spend.</p></div></div>
+        <div class="gap-item" data-rv data-d="4"><span class="no">03</span><div><h4>Unmeasured emissions</h4><p>Transport is a top emitter, yet drivers can't estimate their own footprint.</p></div></div>
+        <div class="gap-item" data-rv data-d="5"><span class="no">04</span><div><h4>Fragmented tools</h4><p>Spend, mileage, prices, habits — tracked separately, if at all. No insight.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 · INSIGHT ============ -->
+  <section class="chapter" data-title="The Insight">
+    <div class="glow g-em" style="width:560px;height:560px;bottom:-15%;left:-5%"></div>
+    <div class="inner split">
+      <div>
+        <span class="kicker" data-rv>02 — The Insight</span>
+        <h2 data-rv data-d="1">Same car. Same road. A <span class="em">15–20%</span> gap.</h2>
+        <p class="lede" data-rv data-d="2">Two drivers on the identical commute can see a <strong>15–20% fuel-cost difference</strong> — purely from how they drive and when they refuel. That's a lever every driver can pull <strong>today</strong>, with zero new hardware.</p>
+        <p class="lede" data-rv data-d="3">The sensor already rides in their pocket: <span class="em">GPS, accelerometer, a camera for receipts.</span></p>
+        <div class="transition" data-rv data-d="4">So we turned the phone into a co-pilot <span class="arr">→</span></div>
+      </div>
+      <div data-rv data-d="3">
+        <svg width="100%" viewBox="0 0 380 280" style="max-width:420px">
+          <!-- diverging driver paths -->
+          <text x="0" y="20" fill="#88a194" font-size="11" letter-spacing="2">COST OVER TIME</text>
+          <line x1="20" y1="240" x2="360" y2="240" class="ln"/>
+          <line x1="20" y1="40" x2="20" y2="240" class="ln"/>
+          <path d="M22 200 C 120 195 240 185 360 175" fill="none" stroke="#34d399" stroke-width="2.5"/>
+          <path d="M22 200 C 120 205 240 130 360 70" fill="none" stroke="#e0a93b" stroke-width="2.5" stroke-dasharray="2 0"/>
+          <circle cx="360" cy="175" r="4" fill="#34d399"/>
+          <circle cx="360" cy="70" r="4" fill="#e0a93b"/>
+          <text x="250" y="165" fill="#34d399" font-size="11">Efficient driver</text>
+          <text x="250" y="60" fill="#e0a93b" font-size="11">Same car, harder foot</text>
+          <!-- gap bracket -->
+          <line x1="345" y1="70" x2="345" y2="175" stroke="#e9f1ec" stroke-width="1"/>
+          <line x1="341" y1="70" x2="349" y2="70" stroke="#e9f1ec" stroke-width="1"/>
+          <line x1="341" y1="175" x2="349" y2="175" stroke="#e9f1ec" stroke-width="1"/>
+          <text x="318" y="128" fill="#e9f1ec" font-size="13" text-anchor="end" font-family="Fraunces">15–20%</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 · SOLUTION ============ -->
+  <section class="chapter" data-title="The Solution">
+    <div class="glow g-em" style="width:600px;height:600px;top:-18%;right:-12%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>03 — The Solution</span>
+      <h2 data-rv data-d="1">Meet <span class="em">PocketDrive.</span></h2>
+      <p class="lede" data-rv data-d="2" style="margin-bottom:2.2rem">A companion that learns <strong>your</strong> driving style and turns it into savings — five abilities, one app, no extra hardware.</p>
+      <div class="grid3">
+        <div class="feat" data-rv data-d="1"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 12 L16 8"/></svg></div><div><h4>Eco-Score</h4><p>A single score from your acceleration, idling and route choices.</p></div></div>
+        <div class="feat" data-rv data-d="2"><div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div><div><h4>Receipt OCR</h4><p>Snap a fuel receipt — it auto-fills your log in seconds.</p></div></div>
+        <div class="feat" data-rv data-d="3"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12 7.7L3 21l1.8-6A8.5 8.5 0 1 1 21 11.5Z"/></svg></div><div><h4>Live AI Coach</h4><p>Claude explains your score and exactly how to improve it.</p></div></div>
+        <div class="feat" data-rv data-d="4"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 18 9 6l5 8 6-6"/></svg></div><div><h4>Route savings</h4><p>Compare routes in real ringgit: "Route B saves RM0.63".</p></div></div>
+        <div class="feat" data-rv data-d="5"><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v4h4"/></svg></div><div><h4>PDF reports</h4><p>One tap ties spend, mileage and emissions together.</p></div></div>
+        <div class="feat" data-rv data-d="6" style="background:rgba(52,211,153,0.07);border-color:rgba(52,211,153,0.3)"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg></div><div><h4>All in one place</h4><p>Cost + behaviour + route + CO₂ — finally unified.</p></div></div>
+      </div>
+      <div class="transition" data-rv data-d="6">Every one of these traces back to a real, documented gap <span class="arr">→</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 5 · MAPPING ============ -->
+  <section class="chapter" data-title="Challenge → Solution">
+    <div class="glow g-gold" style="width:480px;height:480px;bottom:-12%;right:-8%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>04 — Challenge → Solution</span>
+      <h2 data-rv data-d="1">Nothing here is a feature for its own&nbsp;<span class="gold">sake.</span></h2>
+      <div class="card" style="margin-top:2rem;padding:8px 28px" data-rv data-d="2">
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:18px;padding:12px 0;border-bottom:1px solid var(--line-strong)">
+          <span class="chip" style="border:0;color:var(--gold);padding-left:0">The documented challenge</span><span></span><span class="chip" style="border:0;color:var(--em);padding-left:0">What PocketDrive does</span>
+        </div>
+        <div class="map-row"><div class="map-c">No visibility into price trends or refuelling timing</div><div class="map-arr">→</div><div class="map-s">Live price feed + refuel timing advice ("Route B saves RM0.63")</div></div>
+        <div class="map-row"><div class="map-c">No visibility into personal consumption / driving impact</div><div class="map-arr">→</div><div class="map-s">Eco-Score from driving-pattern analysis + AI coach on the "why"</div></div>
+        <div class="map-row"><div class="map-c">Limited understanding of environmental impact</div><div class="map-arr">→</div><div class="map-s">Real-time CO₂ estimate tied to Eco-Score, per trip</div></div>
+        <div class="map-row"><div class="map-c">Fragmented fuel management</div><div class="map-arr">→</div><div class="map-s">One app: receipts, mileage, prices, analytics, PDF reports</div></div>
+      </div>
+      <div class="transition" data-rv data-d="3">And it isn't a mockup — it runs <span class="arr">→</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 6 · DEMO ============ -->
+  <section class="chapter" data-title="Live Demo">
+    <div class="glow g-em" style="width:560px;height:560px;top:-15%;left:50%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>05 — Live Demo</span>
+      <h2 data-rv data-d="1">Two minutes. Five taps. <span class="em">One live AI coach.</span></h2>
+      <p class="lede" data-rv data-d="2" style="margin-bottom:2rem">A working prototype — the coach answers live, not canned.</p>
+      <div class="flow">
+        <div class="step" data-rv data-d="1"><span class="n">01</span><h4>Home</h4><p>Live Eco-Score, budget and alerts at a glance.</p><span class="scr">/ dashboard</span></div>
+        <div class="step" data-rv data-d="2"><span class="n">02</span><h4>Fuel</h4><p>Scan a real receipt — watch it auto-fill instantly.</p><span class="scr">/ ocr scan</span></div>
+        <div class="step" data-rv data-d="3" style="border-color:rgba(52,211,153,0.35);background:rgba(52,211,153,0.06)"><span class="n" style="color:var(--em)">03</span><h4>Drive</h4><p>Simulate a trip → get a score → ask the AI coach live.</p><span class="scr">/ ask claude ●</span></div>
+        <div class="step" data-rv data-d="4"><span class="n">04</span><h4>Navigate</h4><p>Compare routes: "Route B saves RM0.63" + refuel advice.</p><span class="scr">/ routes</span></div>
+        <div class="step" data-rv data-d="5"><span class="n">05</span><h4>Profile</h4><p>Generate a monthly PDF report on the spot.</p><span class="scr">/ export pdf</span></div>
+      </div>
+      <div class="transition" data-rv data-d="6">Why does this matter right now? <span class="arr">→</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 7 · WHY NOW ============ -->
+  <section class="chapter" data-title="Why Now">
+    <div class="glow g-gold" style="width:520px;height:520px;top:-10%;right:-10%"></div>
+    <div class="inner split">
+      <div>
+        <span class="kicker" data-rv>06 — Why Now</span>
+        <h2 data-rv data-d="1">The ground is moving under every&nbsp;<span class="gold">driver.</span></h2>
+        <p class="lede" data-rv data-d="2">Fuel cost is going from uniform to personal — fast. And almost everyone already owns the device that makes their exposure visible.</p>
+        <div class="transition" data-rv data-d="3">And the market is enormous <span class="arr">→</span></div>
+      </div>
+      <div class="tl" data-rv data-d="2">
+        <div class="tl-row"><div class="tl-when">2024</div><div class="tl-what"><h4>Diesel floats</h4><p>Tied to global oil prices — direct exposure to volatility.</p></div></div>
+        <div class="tl-row hot"><div class="tl-when">2025–26</div><div class="tl-what"><h4>BUDI95 rollout</h4><p>T15 exclusion + capped quotas. Cost becomes personalized, not flat.</p></div></div>
+        <div class="tl-row hot"><div class="tl-when">2026</div><div class="tl-what"><h4>Oil shocks</h4><p>Iran conflict pushes Brent above $100 — subsidy ceilings can shift overnight.</p></div></div>
+        <div class="tl-row"><div class="tl-when">Today</div><div class="tl-what"><h4>Smartphones everywhere</h4><p>Near-universal penetration = zero hardware barrier to visibility.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · MARKET ============ -->
+  <section class="chapter" data-title="Market">
+    <div class="glow g-em" style="width:600px;height:600px;bottom:-20%;left:-10%"></div>
+    <div class="inner split">
+      <div>
+        <span class="kicker" data-rv>07 — Market Opportunity</span>
+        <h2 data-rv data-d="1">17 million cars. We start in the <span class="em">Klang Valley.</span></h2>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:1.8rem">
+          <div data-rv data-d="2"><span class="chip" style="color:var(--faint);border-color:var(--line)">TAM</span><p class="lede" style="margin-top:8px"><strong style="color:#e9f1ec">~17.2M car owners</strong> in Malaysia — roughly one car for every two people.</p></div>
+          <div data-rv data-d="3"><span class="chip" style="color:var(--em);border-color:rgba(52,211,153,0.3)">SAM</span><p class="lede" style="margin-top:8px"><strong style="color:#e9f1ec">~4.4M private cars</strong> in the Klang Valley — commuters most exposed to price volatility.</p></div>
+          <div data-rv data-d="4"><span class="chip" style="color:var(--gold);border-color:rgba(244,198,106,0.35)">SOM</span><p class="lede" style="margin-top:8px"><strong style="color:#e9f1ec">50K users · ~RM25K MRR</strong> Year 1–2 — 2,500 Pro subs + 3–5 B2B fleet pilots.</p></div>
+        </div>
+        <div class="transition" data-rv data-d="5">Here's how it pays for itself <span class="arr">→</span></div>
+      </div>
+      <div data-rv data-d="3" style="display:grid;place-items:center">
+        <!-- bullseye -->
+        <svg width="100%" viewBox="0 0 360 360" style="max-width:400px">
+          <circle cx="180" cy="180" r="170" fill="rgba(180,225,205,0.04)" stroke="rgba(180,225,205,0.18)"/>
+          <circle cx="180" cy="180" r="115" fill="rgba(52,211,153,0.07)" stroke="rgba(52,211,153,0.35)"/>
+          <circle cx="180" cy="180" r="58" fill="rgba(244,198,106,0.14)" stroke="rgba(244,198,106,0.6)"/>
+          <text x="180" y="172" text-anchor="middle" fill="#f4c66a" font-size="13" font-family="Fraunces">50K</text>
+          <text x="180" y="190" text-anchor="middle" fill="#88a194" font-size="9" letter-spacing="2">SOM</text>
+          <text x="180" y="92" text-anchor="middle" fill="#34d399" font-size="13" font-family="Fraunces">4.4M</text>
+          <text x="180" y="108" text-anchor="middle" fill="#88a194" font-size="9" letter-spacing="2">SAM · KLANG VALLEY</text>
+          <text x="180" y="36" text-anchor="middle" fill="#e9f1ec" font-size="13" font-family="Fraunces">17.2M</text>
+          <text x="180" y="52" text-anchor="middle" fill="#88a194" font-size="9" letter-spacing="2">TAM · MALAYSIA</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 · BUSINESS MODEL ============ -->
+  <section class="chapter" data-title="Business Model">
+    <div class="glow g-gold" style="width:520px;height:520px;top:-12%;left:40%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>08 — Business Model</span>
+      <h2 data-rv data-d="1">Three ways to earn from one <span class="gold">habit.</span></h2>
+      <div class="grid3" style="margin-top:2rem">
+        <div class="stream" data-rv data-d="1"><span class="tag">Freemium</span><h4>Pro tier</h4><p>Core tracking free. Pro unlocks the AI coach, multi-vehicle analytics and detailed reports.</p><span class="price">RM9.90 / month</span></div>
+        <div class="stream" data-rv data-d="2"><span class="tag">B2B SaaS</span><h4>Fleet reporting</h4><p>Per-vehicle fuel + emissions reporting for company fleets and logistics.</p><span class="price">per-vehicle pricing</span></div>
+        <div class="stream" data-rv data-d="3"><span class="tag">Partnerships</span><h4>Affiliate</h4><p>Petrol-station promos, insurance safe-driver discounts, EV-transition nudges.</p><span class="price">revenue share</span></div>
+      </div>
+      <div class="transition" data-rv data-d="4">And the habit pays the planet too <span class="arr">→</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 10 · SUSTAINABILITY ============ -->
+  <section class="chapter" data-title="Sustainability">
+    <div class="glow g-em" style="width:560px;height:560px;bottom:-18%;right:-8%"></div>
+    <div class="inner split">
+      <div>
+        <span class="kicker" data-rv>09 — Sustainability</span>
+        <h2 data-rv data-d="1">Every percent saved is carbon <span class="em">avoided.</span></h2>
+        <p class="lede" data-rv data-d="2">The Eco-Score makes an abstract goal <strong>tangible and habit-forming</strong> — "drive greener" becomes something you watch improve week by week, with <span class="gold">money attached</span> to every gain.</p>
+        <div class="transition" data-rv data-d="3">No one else ties all three together <span class="arr">→</span></div>
+      </div>
+      <div data-rv data-d="2">
+        <!-- weekly habit bars -->
+        <svg width="100%" viewBox="0 0 380 240" style="max-width:420px">
+          <text x="0" y="18" fill="#88a194" font-size="11" letter-spacing="2">ECO-SCORE · WEEK BY WEEK</text>
+          <line x1="10" y1="200" x2="370" y2="200" class="ln"/>
+          <g>
+            <rect x="30" y="150" width="38" height="50" rx="5" fill="rgba(52,211,153,0.25)"/>
+            <rect x="90" y="125" width="38" height="75" rx="5" fill="rgba(52,211,153,0.4)"/>
+            <rect x="150" y="100" width="38" height="100" rx="5" fill="rgba(52,211,153,0.55)"/>
+            <rect x="210" y="78" width="38" height="122" rx="5" fill="rgba(52,211,153,0.7)"/>
+            <rect x="270" y="52" width="38" height="148" rx="5" fill="#34d399"/>
+          </g>
+          <path d="M49 150 L109 125 L169 100 L229 78 L289 52" fill="none" stroke="#f4c66a" stroke-width="2"/>
+          <circle cx="289" cy="52" r="5" fill="#f4c66a"/>
+          <text x="316" y="56" fill="#f4c66a" font-size="13" font-family="Fraunces">↑ saved</text>
+          <text x="30" y="222" fill="#5d7268" font-size="10">W1</text>
+          <text x="270" y="222" fill="#5d7268" font-size="10">W5</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 11 · COMPETITIVE ============ -->
+  <section class="chapter" data-title="Competitive">
+    <div class="glow g-gold" style="width:500px;height:500px;top:-10%;left:-8%"></div>
+    <div class="inner split">
+      <div>
+        <span class="kicker" data-rv>10 — Competitive Landscape</span>
+        <h2 data-rv data-d="1">Routes, or logs, or scores — <span class="gold">never all three.</span></h2>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:1.6rem">
+          <p class="lede" data-rv data-d="2" style="margin:0"><strong>Waze / Google Maps:</strong> routes only — no driving-style coaching or cost tie-in.</p>
+          <p class="lede" data-rv data-d="3" style="margin:0"><strong>Fuel-tracker apps:</strong> manual logging, no AI, no behaviour insight.</p>
+          <p class="lede" data-rv data-d="4" style="margin:0"><strong>Insurance UBI apps:</strong> behaviour scoring exists — but locked to one insurer.</p>
+          <p class="lede" data-rv data-d="5" style="margin:0;color:var(--ink)"><span class="em">PocketDrive:</span> personalization + live AI coaching + cost translation, in one app, zero hardware.</p>
+        </div>
+        <div class="transition" data-rv data-d="6">Here's where we go next <span class="arr">→</span></div>
+      </div>
+      <div data-rv data-d="3" style="display:grid;place-items:center">
+        <!-- positioning matrix -->
+        <svg width="100%" viewBox="0 0 340 320" style="max-width:380px">
+          <line x1="40" y1="20" x2="40" y2="280" class="ln"/>
+          <line x1="40" y1="280" x2="320" y2="280" class="ln"/>
+          <text x="46" y="18" fill="#88a194" font-size="9.5">PERSONALIZED COACHING ↑</text>
+          <text x="320" y="298" fill="#88a194" font-size="9.5" text-anchor="end">COST + EMISSIONS TIE-IN →</text>
+          <!-- competitors -->
+          <circle cx="90" cy="90" r="7" fill="rgba(180,225,205,0.3)"/><text x="100" y="94" fill="#88a194" font-size="10">Maps/Waze</text>
+          <circle cx="120" cy="220" r="7" fill="rgba(180,225,205,0.3)"/><text x="130" y="224" fill="#88a194" font-size="10">Fuel logs</text>
+          <circle cx="170" cy="130" r="7" fill="rgba(180,225,205,0.3)"/><text x="180" y="134" fill="#88a194" font-size="10">Insurance UBI</text>
+          <!-- pocketdrive -->
+          <circle cx="278" cy="70" r="12" fill="#34d399"/>
+          <circle cx="278" cy="70" r="20" fill="none" stroke="#34d399" stroke-opacity="0.4"/>
+          <text x="278" y="46" fill="#34d399" font-size="11" text-anchor="middle" font-family="Fraunces">PocketDrive</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 12 · ROADMAP ============ -->
+  <section class="chapter" data-title="Roadmap">
+    <div class="glow g-em" style="width:560px;height:560px;top:-15%;right:-10%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>11 — Roadmap</span>
+      <h2 data-rv data-d="1">Built so the real sensors slot <span class="em">straight in.</span></h2>
+      <div class="road" style="margin-top:2.4rem">
+        <div class="road-col now" data-rv data-d="1"><div class="road-head"><span class="d"></span><h4>Now</h4></div><p>Working prototype — simulated drive data, live AI coach, OCR receipt scanning.</p></div>
+        <div class="road-col next" data-rv data-d="2"><div class="road-head"><span class="d"></span><h4>Next</h4></div><p>Real GPS/sensor integration + live fuel-price feeds — drop-in modules, no UI changes.</p></div>
+        <div class="road-col later" data-rv data-d="3"><div class="road-head"><span class="d"></span><h4>Later</h4></div><p>Insurance partnership pilots and full fleet-SaaS rollout.</p></div>
+      </div>
+      <div class="transition" data-rv data-d="4">Behind it, a small team <span class="arr">→</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 13 · TEAM ============ -->
+  <section class="chapter" data-title="The Team">
+    <div class="glow g-gold" style="width:480px;height:480px;bottom:-14%;left:30%"></div>
+    <div class="inner">
+      <span class="kicker" data-rv>12 — The Team</span>
+      <h2 data-rv data-d="1" style="margin-bottom:2.4rem">Three builders, one <span class="gold">co-pilot.</span></h2>
+      <div class="grid3">
+        <div class="tcard" data-rv data-d="1"><div class="av">A</div><h4>Your Name</h4><p>Role / focus</p></div>
+        <div class="tcard" data-rv data-d="2"><div class="av">B</div><h4>Your Name</h4><p>Role / focus</p></div>
+        <div class="tcard" data-rv data-d="3"><div class="av">C</div><h4>Your Name</h4><p>Role / focus</p></div>
+      </div>
+      <p class="lede" data-rv data-d="4" style="margin-top:1.6rem;font-size:0.85rem;color:var(--faint)">— Send me the three names &amp; roles and I'll slot them in.</p>
+      <div class="transition" data-rv data-d="5">One last thing <span class="arr">→</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 14 · CLOSING ============ -->
+  <section class="chapter" data-title="Closing">
+    <div class="glow g-em" style="width:680px;height:680px;top:-20%;left:-10%;opacity:0.6"></div>
+    <div class="glow g-gold" style="width:460px;height:460px;bottom:-15%;right:-8%"></div>
+    <div class="inner" style="text-align:center;display:flex;flex-direction:column;align-items:center">
+      <span class="kicker" data-rv style="justify-content:center"><span class="dot" style="display:none"></span>PocketDrive</span>
+      <p class="close-quote" data-rv data-d="1" style="margin:0 auto">The tool every driver didn't know they <span class="em">needed.</span></p>
+      <p class="lede" data-rv data-d="2" style="margin:1.6rem auto 0;text-align:center">Every percent saved is money back in their pocket — and carbon out of the air.</p>
+      <div class="close-slogan" data-rv data-d="3">Know when to fill up · Know how to drive smart · Save more every week</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const deck = document.getElementById('deck');
+  const chapters = [...document.querySelectorAll('.chapter')];
+  const nav = document.getElementById('nav');
+  const progress = document.getElementById('progress');
+
+  // build dot nav
+  chapters.forEach((ch,i)=>{
+    const b=document.createElement('button');
+    b.innerHTML=`<span>${String(i+1).padStart(2,'0')} · ${ch.dataset.title}</span>`;
+    b.addEventListener('click',()=>ch.scrollIntoView({behavior:'smooth'}));
+    nav.appendChild(b);
+  });
+  const dots=[...nav.children];
+
+  // active chapter + reveal via IntersectionObserver
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting && e.intersectionRatio>0.5){
+        const i=chapters.indexOf(e.target);
+        e.target.classList.add('active');
+        dots.forEach((d,j)=>d.classList.toggle('on',j===i));
+      }
+    });
+  },{threshold:[0.5]});
+  chapters.forEach(ch=>io.observe(ch));
+
+  // progress bar
+  deck.addEventListener('scroll',()=>{
+    const max=deck.scrollHeight-deck.clientHeight;
+    progress.style.width=(deck.scrollTop/max*100)+'%';
+  });
+
+  // keyboard nav
+  let idx=0;
+  function go(n){idx=Math.max(0,Math.min(chapters.length-1,n));chapters[idx].scrollIntoView({behavior:'smooth'});}
+  deck.addEventListener('scroll',()=>{idx=Math.round(deck.scrollTop/deck.clientHeight);});
+  window.addEventListener('keydown',(e)=>{
+    if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();go(idx+1);}
+    if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(idx-1);}
+    if(e.key==='Home')go(0); if(e.key==='End')go(chapters.length-1);
+  });
+
+  // activate first
+  chapters[0].classList.add('active');
+  dots[0].classList.add('on');
+</script>
+</body>
+</html>
