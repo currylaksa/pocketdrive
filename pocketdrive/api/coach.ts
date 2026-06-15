@@ -43,7 +43,9 @@ When the user tells you their destination, respond with a structured Trip Strate
 7. Fuel price risk this week (make a reasonable assessment)
 8. One eco-driving tip specific to this journey
 
-Keep the tone friendly, specific, and practical. Use Malaysian context. Never contradict the data values given above.`
+Keep the tone friendly, specific, and practical. Use Malaysian context. Never contradict the data values given above.
+
+Reply in plain text only — no Markdown. Do not use #, ##, **, bullet stars, tables, or --- separators. Use simple numbered lines (1., 2., 3., …) and short sentences.`
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
