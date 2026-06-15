@@ -1,13 +1,24 @@
-import { useState } from 'react'
-import { Home, Fuel, Gauge, Navigation, User } from 'lucide-react'
+import { lazy, Suspense, useState } from 'react'
+import { Home, Fuel, Gauge, Navigation, User, Loader2 } from 'lucide-react'
 import { PhoneFrame } from './components/PhoneFrame'
 import { ChatBot } from './components/ChatBot'
 import { NotificationsSheet } from './components/Notifications'
-import { HomeScreen } from './screens/Home'
-import { FuelScreen } from './screens/Fuel'
-import { DriveScreen } from './screens/Drive'
-import { NavigateScreen } from './screens/Navigate'
-import { ProfileScreen } from './screens/Profile'
+
+// Lazy-load each tab so the initial bundle stays small — recharts (used only
+// in Fuel) and per-screen code split into their own chunks, fetched on tap.
+const HomeScreen = lazy(() => import('./screens/Home').then((m) => ({ default: m.HomeScreen })))
+const FuelScreen = lazy(() => import('./screens/Fuel').then((m) => ({ default: m.FuelScreen })))
+const DriveScreen = lazy(() => import('./screens/Drive').then((m) => ({ default: m.DriveScreen })))
+const NavigateScreen = lazy(() => import('./screens/Navigate').then((m) => ({ default: m.NavigateScreen })))
+const ProfileScreen = lazy(() => import('./screens/Profile').then((m) => ({ default: m.ProfileScreen })))
+
+function ScreenFallback() {
+  return (
+    <div className="grid h-full place-items-center">
+      <Loader2 size={26} className="animate-spin text-brand-500" />
+    </div>
+  )
+}
 
 type Tab = 'home' | 'fuel' | 'drive' | 'navigate' | 'profile'
 
@@ -28,16 +39,18 @@ export default function App() {
       <div className="relative flex h-full flex-col">
         {/* Scrollable content */}
         <main className="no-scrollbar flex-1 overflow-y-auto bg-slate-50">
-          {tab === 'home' && (
-            <HomeScreen
-              onNavigate={setTab as (t: string) => void}
-              onOpenNotifications={() => setNotifOpen(true)}
-            />
-          )}
-          {tab === 'fuel' && <FuelScreen />}
-          {tab === 'drive' && <DriveScreen />}
-          {tab === 'navigate' && <NavigateScreen />}
-          {tab === 'profile' && <ProfileScreen />}
+          <Suspense fallback={<ScreenFallback />}>
+            {tab === 'home' && (
+              <HomeScreen
+                onNavigate={setTab as (t: string) => void}
+                onOpenNotifications={() => setNotifOpen(true)}
+              />
+            )}
+            {tab === 'fuel' && <FuelScreen />}
+            {tab === 'drive' && <DriveScreen />}
+            {tab === 'navigate' && <NavigateScreen />}
+            {tab === 'profile' && <ProfileScreen />}
+          </Suspense>
         </main>
 
         {/* Bottom tab bar */}
