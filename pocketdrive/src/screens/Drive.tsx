@@ -20,6 +20,7 @@ import {
   recommendations,
   dailyFootprint,
   estimateFuel,
+  co2FromFuel,
   type Recommendation,
 } from '../lib/logic'
 
@@ -224,7 +225,7 @@ function SessionReplay({ session }: { session: Session }) {
           <Metric value={`${elapsed}m`} label="duration" />
           <Metric value={`${session.distanceKm}`} label="km" />
           <Metric value={`${estimateFuel(session.distanceKm, 14.2).toFixed(2)}`} label="L fuel" />
-          <Metric value={`${session.topSpeed}`} label="top km/h" />
+          <Metric value={`${co2FromFuel(estimateFuel(session.distanceKm, 14.2)).toFixed(2)}`} label="kg CO₂" />
         </div>
         {phase === 'running' && (
           <div className="mt-3">
